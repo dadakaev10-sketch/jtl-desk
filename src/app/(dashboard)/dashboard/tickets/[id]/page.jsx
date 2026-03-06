@@ -30,6 +30,21 @@ export default function TicketDetailPage() {
   async function sendMessage(body, type = 'agent') {
     if (!body.trim()) return
     setSending(true)
+
+    // Bei WhatsApp-Tickets: Antwort auch via Bridge senden
+    if (ticket?.channel === 'whatsapp' && ticket?.customer_phone) {
+      await fetch('/api/openclaw/process', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ticketId: id,
+          tenantId: tenant?.id,
+          message: body,
+          target: ticket.customer_phone,
+        }),
+      }).catch(() => {}) // Fehler ignorieren — Nachricht wird trotzdem gespeichert
+    }
+
     const supabase = getSupabaseClient()
     await supabase.from('messages').insert({
       ticket_id: id,
