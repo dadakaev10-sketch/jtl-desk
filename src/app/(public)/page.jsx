@@ -1,46 +1,39 @@
 import Link from 'next/link'
 import PageLayout from '@/components/layout/PageLayout'
+import { TicketIcon, SparkleIcon, LinkIcon, UsersIcon, ChartIcon, BuildingIcon, CheckIcon } from '@/components/ui/Icons'
 
 export const metadata = {
   title: 'JTL-Desk – Automatisierter Kundenservice für JTL Shop & WAWI',
 }
 
-function CheckIcon() {
-  return (
-    <svg className="w-5 h-5 text-[--success] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-    </svg>
-  )
-}
-
 const FEATURES = [
   {
-    icon: '🎫',
+    Icon: TicketIcon,
     title: 'Automatisches Ticketsystem',
     desc: 'Eingehende E-Mails, WhatsApp und Web-Anfragen werden automatisch als Tickets angelegt und kategorisiert.',
   },
   {
-    icon: '🤖',
+    Icon: SparkleIcon,
     title: 'KI-gestützte Antworten',
-    desc: 'Claude AI analysiert Bestelldaten aus deinem JTL-System und schlägt präzise Antworten vor – in Sekunden.',
+    desc: 'Gemini AI analysiert Bestelldaten aus deinem JTL-System und schlägt präzise Antworten vor – in Sekunden.',
   },
   {
-    icon: '🔗',
+    Icon: LinkIcon,
     title: 'Tiefe JTL-Integration',
     desc: 'Bestellstatus, Versandinformationen und Kundendaten direkt aus JTL Shop & WAWI abrufen.',
   },
   {
-    icon: '👥',
+    Icon: UsersIcon,
     title: 'Multi-Agenten-Management',
     desc: 'Tickets zuweisen, Prioritäten setzen, SLA-Zeiten überwachen – alles in einem Dashboard.',
   },
   {
-    icon: '📊',
+    Icon: ChartIcon,
     title: 'SLA-Überwachung',
     desc: 'Automatische Eskalation bei SLA-Überschreitung. Nie wieder ein Ticket vergessen.',
   },
   {
-    icon: '🏢',
+    Icon: BuildingIcon,
     title: 'Multi-Tenant',
     desc: 'Jeder JTL-Händler bekommt seinen eigenen abgeschotteten Workspace mit vollständiger Datentrennung.',
   },
@@ -138,9 +131,11 @@ export default function LandingPage() {
           Alles was dein JTL-Support braucht
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {FEATURES.map(({ icon, title, desc }) => (
+          {FEATURES.map(({ Icon, title, desc }) => (
             <div key={title} className="border border-[--border] rounded-xl p-5 hover:shadow-md transition-shadow">
-              <div className="text-3xl mb-3">{icon}</div>
+              <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center mb-3">
+                <Icon className="w-5 h-5 text-[--primary]" />
+              </div>
               <h3 className="font-semibold text-gray-900 mb-2">{title}</h3>
               <p className="text-sm text-[--text-muted]">{desc}</p>
             </div>
@@ -181,12 +176,7 @@ export default function LandingPage() {
                 <ul className="space-y-2 mb-8 flex-1">
                   {features.map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm">
-                      <svg
-                        className={`w-4 h-4 flex-shrink-0 ${highlighted ? 'text-white' : 'text-[--success]'}`}
-                        fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
+                      <CheckIcon className={`w-4 h-4 flex-shrink-0 ${highlighted ? 'text-white' : 'text-[--success]'}`} />
                       <span className={highlighted ? 'text-white/90' : 'text-gray-600'}>{f}</span>
                     </li>
                   ))}

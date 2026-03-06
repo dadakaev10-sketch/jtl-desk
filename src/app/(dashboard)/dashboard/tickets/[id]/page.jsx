@@ -11,6 +11,7 @@ import Card from '@/components/ui/Card'
 import Spinner from '@/components/ui/Spinner'
 import SLATimer from '@/components/shared/SLATimer'
 import AgentAvatar from '@/components/shared/AgentAvatar'
+import { ChannelIcon } from '@/components/ui/Icons'
 import { TICKET_STATUS, TICKET_PRIORITY, CHANNELS } from '@/lib/constants'
 
 function timeStr(ts) {
@@ -83,13 +84,21 @@ export default function TicketDetailPage() {
           <div className="flex items-center gap-2 mt-2 flex-wrap">
             <Badge color={statusCfg?.color}>{statusCfg?.label}</Badge>
             <Badge color={priorityCfg?.color}>{priorityCfg?.label}</Badge>
-            {channelCfg && <span className="text-sm text-[--text-muted]">{channelCfg.icon} {channelCfg.label}</span>}
+            {channelCfg && (
+              <span className="inline-flex items-center gap-1 text-sm text-[--text-muted]">
+                <ChannelIcon channel={channelCfg.channel} className="w-4 h-4" />
+                {channelCfg.label}
+              </span>
+            )}
             <SLATimer deadline={ticket.sla_deadline} status={ticket.status} />
           </div>
         </div>
         <div className="flex items-center gap-2">
           {ticket.status !== 'resolved' && (
-            <Button variant="secondary" size="sm" onClick={() => updateStatus('resolved')}>✓ Lösen</Button>
+            <Button variant="secondary" size="sm" onClick={() => updateStatus('resolved')}>
+              <svg className="w-3.5 h-3.5 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+              Lösen
+            </Button>
           )}
           {ticket.status !== 'escalated' && (
             <Button variant="danger" size="sm" onClick={() => updateStatus('escalated')}>Eskalieren</Button>
@@ -136,7 +145,8 @@ export default function TicketDetailPage() {
             {aiError && <p className="text-xs text-red-600 mt-1">{aiError}</p>}
             <div className="flex justify-between mt-2">
               <Button variant="ghost" size="sm" onClick={generateAIReply} loading={aiLoading}>
-                ✨ KI-Antwort
+                <svg className="w-3.5 h-3.5 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" /></svg>
+                KI-Antwort
               </Button>
               <Button size="sm" onClick={() => sendMessage(reply)} loading={sending} disabled={!reply.trim()}>
                 Senden

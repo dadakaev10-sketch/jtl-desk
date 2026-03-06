@@ -84,7 +84,9 @@ export default function OnboardingPage() {
                 s.id < step ? 'bg-[--success] text-white' :
                 s.id === step ? 'bg-[--primary] text-white' : 'bg-gray-200 text-gray-400'
               }`}>
-                {s.id < step ? '✓' : s.id}
+                {s.id < step ? (
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+              ) : s.id}
               </div>
               {i < STEPS.length - 1 && <div className={`flex-1 h-0.5 mx-1 ${s.id < step ? 'bg-[--success]' : 'bg-gray-200'}`} />}
             </div>
@@ -109,8 +111,18 @@ export default function OnboardingPage() {
               <Button variant="secondary" onClick={testJTL} loading={loading} size="sm">
                 Verbindung testen
               </Button>
-              {testResult === 'success' && <p className="text-xs text-[--success]">✓ Verbindung erfolgreich</p>}
-              {testResult === 'error' && <p className="text-xs text-[--danger]">✗ Verbindung fehlgeschlagen</p>}
+              {testResult === 'success' && (
+                <p className="flex items-center gap-1 text-xs text-[--success]">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                  Verbindung erfolgreich
+                </p>
+              )}
+              {testResult === 'error' && (
+                <p className="flex items-center gap-1 text-xs text-[--danger]">
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                  Verbindung fehlgeschlagen
+                </p>
+              )}
             </div>
           )}
 

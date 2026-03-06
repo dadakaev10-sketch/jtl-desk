@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Badge from '@/components/ui/Badge'
+import { ChannelIcon } from '@/components/ui/Icons'
 import SLATimer from './SLATimer'
 import AgentAvatar from './AgentAvatar'
 import { TICKET_STATUS, TICKET_PRIORITY, CHANNELS } from '@/lib/constants'
@@ -36,7 +37,10 @@ export default function TicketRow({ ticket }) {
         <p className="text-sm font-medium text-gray-900 truncate">{subject}</p>
         <div className="flex items-center gap-2 mt-0.5">
           {channelCfg && (
-            <span className="text-xs text-[--text-muted]">{channelCfg.icon} {channelCfg.label}</span>
+            <span className="inline-flex items-center gap-1 text-xs text-[--text-muted]">
+              <ChannelIcon channel={channelCfg.channel} />
+              {channelCfg.label}
+            </span>
           )}
           <span className="text-xs text-[--text-muted]">{timeAgo(created_at)}</span>
         </div>

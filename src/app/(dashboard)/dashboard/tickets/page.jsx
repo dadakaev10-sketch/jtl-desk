@@ -9,6 +9,7 @@ import Button from '@/components/ui/Button'
 import Card from '@/components/ui/Card'
 import EmptyState from '@/components/ui/EmptyState'
 import Spinner from '@/components/ui/Spinner'
+import { InboxIcon } from '@/components/ui/Icons'
 
 const STATUS_FILTERS = [
   { value: '', label: 'Alle' },
@@ -56,7 +57,7 @@ export default function TicketsPage() {
           </div>
         ) : tickets.length === 0 ? (
           <EmptyState
-            icon="📥"
+            icon={<InboxIcon className="w-10 h-10" />}
             title="Keine Tickets"
             description="Noch keine Tickets in dieser Kategorie."
             action={{ label: 'Neues Ticket erstellen', onClick: () => {} }}

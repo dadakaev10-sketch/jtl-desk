@@ -19,10 +19,10 @@ export const TICKET_PRIORITY = {
 }
 
 export const CHANNELS = {
-  email:    { label: 'E-Mail',    icon: '✉️' },
-  whatsapp: { label: 'WhatsApp',  icon: '💬' },
-  telegram: { label: 'Telegram',  icon: '📱' },
-  web:      { label: 'Web',       icon: '🌐' },
+  email:    { label: 'E-Mail',   channel: 'email' },
+  whatsapp: { label: 'WhatsApp', channel: 'whatsapp' },
+  telegram: { label: 'Telegram', channel: 'telegram' },
+  web:      { label: 'Web',      channel: 'web' },
 }
 
 export const AGENT_ROLES = {

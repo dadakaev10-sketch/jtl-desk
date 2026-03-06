@@ -12,6 +12,7 @@ import Modal from '@/components/ui/Modal'
 import Input from '@/components/ui/Input'
 import Spinner from '@/components/ui/Spinner'
 import EmptyState from '@/components/ui/EmptyState'
+import { UsersIcon } from '@/components/ui/Icons'
 
 export default function AgentsPage() {
   const { tenant } = useTenant()
@@ -50,7 +51,7 @@ export default function AgentsPage() {
           <div className="flex justify-center py-12"><Spinner size="lg" className="text-[--primary]" /></div>
         ) : agents.length === 0 ? (
           <EmptyState
-            icon="👥"
+            icon={<UsersIcon className="w-10 h-10" />}
             title="Noch kein Team"
             description="Lade Agenten ein, um Tickets gemeinsam zu bearbeiten."
             action={{ label: 'Agenten einladen', onClick: () => setInviteOpen(true) }}
