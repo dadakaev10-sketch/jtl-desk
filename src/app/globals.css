@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #2563EB;
+  --primary-hover: #1D4ED8;
+  --primary-light: #EFF6FF;
+  --danger: #DC2626;
+  --danger-light: #FEF2F2;
+  --warning: #D97706;
+  --warning-light: #FFFBEB;
+  --success: #16A34A;
+  --success-light: #F0FDF4;
+  --text-muted: #6B7280;
+  --border: #E5E7EB;
+  --bg: #F3F4F6;
+  --card: #FFFFFF;
+  --sidebar-bg: #111827;
+  --sidebar-text: #D1D5DB;
+  --sidebar-active: #2563EB;
+  --sidebar-width: 240px;
+  --navbar-height: 60px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: #111827;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
+
+/* Focus outline */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Transitions */
+a { color: inherit; text-decoration: none; }
+
+/* Status colors utility */
+.status-open    { color: var(--primary); background: var(--primary-light); }
+.status-progress { color: var(--warning); background: var(--warning-light); }
+.status-resolved { color: var(--success); background: var(--success-light); }
+.status-escalated { color: var(--danger); background: var(--danger-light); }
