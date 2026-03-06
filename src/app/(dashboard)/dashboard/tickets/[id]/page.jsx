@@ -13,6 +13,7 @@ import SLATimer from '@/components/shared/SLATimer'
 import AgentAvatar from '@/components/shared/AgentAvatar'
 import { ChannelIcon } from '@/components/ui/Icons'
 import { TICKET_STATUS, TICKET_PRIORITY, CHANNELS } from '@/lib/constants'
+import ConfirmDialog from '@/components/shared/ConfirmDialog'
 
 function timeStr(ts) {
   return new Date(ts).toLocaleString('de-AT', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
@@ -26,6 +27,7 @@ export default function TicketDetailPage() {
   const [sending, setSending] = useState(false)
   const [aiLoading, setAiLoading] = useState(false)
   const [aiError, setAiError] = useState('')
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const messagesEndRef = useRef(null)
 
   // Auto-scroll wenn neue Nachrichten ankommen
@@ -106,6 +108,13 @@ export default function TicketDetailPage() {
     await supabase.from('tickets').update({ status, updated_at: new Date().toISOString() }).eq('id', id)
   }
 
+  async function deleteTicket() {
+    const supabase = getSupabaseClient()
+    await supabase.from('messages').delete().eq('ticket_id', id)
+    await supabase.from('tickets').delete().eq('id', id)
+    window.location.href = '/dashboard/tickets'
+  }
+
   if (loading) return <div className="flex justify-center py-12"><Spinner size="lg" className="text-[--primary]" /></div>
   if (!ticket) return <p className="text-[--text-muted]">Ticket nicht gefunden.</p>
 
@@ -141,7 +150,19 @@ export default function TicketDetailPage() {
           {ticket.status !== 'escalated' && (
             <Button variant="danger" size="sm" onClick={() => updateStatus('escalated')}>Eskalieren</Button>
           )}
+          <Button variant="danger" size="sm" onClick={() => setShowDeleteConfirm(true)}>
+            <svg className="w-3.5 h-3.5 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            Löschen
+          </Button>
         </div>
+        <ConfirmDialog
+          open={showDeleteConfirm}
+          title="Ticket löschen"
+          message="Dieses Ticket und alle Nachrichten werden unwiderruflich gelöscht. Fortfahren?"
+          danger
+          onConfirm={deleteTicket}
+          onCancel={() => setShowDeleteConfirm(false)}
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

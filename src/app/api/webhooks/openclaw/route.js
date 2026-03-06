@@ -31,7 +31,7 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { channel, from, fromName, message, tenantSlug } = body
+  const { channel, from, fromName, message, aiReply, tenantSlug } = body
   if (!from || !message) {
     return NextResponse.json({ error: 'from und message erforderlich' }, { status: 400 })
   }
@@ -76,6 +76,16 @@ export async function POST(request) {
       sender_name: fromName || from,
       body: message,
     })
+    // Bot-Antwort speichern wenn KI geantwortet hat
+    if (aiReply && aiReply.trim()) {
+      await supabase.from('messages').insert({
+        ticket_id: ticketId,
+        tenant_id: tenant.id,
+        sender_type: 'bot',
+        sender_name: 'KI-Assistent',
+        body: aiReply,
+      })
+    }
   } else {
     // Neues Ticket erstellen
     const subject = message.length > 60
@@ -110,6 +120,16 @@ export async function POST(request) {
       sender_name: fromName || from,
       body: message,
     })
+    // Bot-Antwort speichern wenn KI geantwortet hat
+    if (aiReply && aiReply.trim()) {
+      await supabase.from('messages').insert({
+        ticket_id: ticketId,
+        tenant_id: tenant.id,
+        sender_type: 'bot',
+        sender_name: 'KI-Assistent',
+        body: aiReply,
+      })
+    }
   }
 
   return NextResponse.json({ ok: true, ticketId, isNew: !existingTicket })
