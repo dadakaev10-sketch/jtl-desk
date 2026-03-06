@@ -4,6 +4,7 @@ import { ChannelIcon } from '@/components/ui/Icons'
 import SLATimer from './SLATimer'
 import AgentAvatar from './AgentAvatar'
 import { TICKET_STATUS, TICKET_PRIORITY, CHANNELS } from '@/lib/constants'
+import { BellIcon } from '@/components/ui/Icons'
 
 function timeAgo(ts) {
   const diff = Date.now() - new Date(ts)
@@ -15,7 +16,7 @@ function timeAgo(ts) {
   return `vor ${Math.floor(h / 24)} Tagen`
 }
 
-export default function TicketRow({ ticket, isNew, onView }) {
+export default function TicketRow({ ticket, isNew, hasNewMsg, onView }) {
   const { id, subject, status, priority, assigned_to, sla_deadline, channel, created_at } = ticket
   const statusCfg = TICKET_STATUS[status] || TICKET_STATUS.open
   const priorityCfg = TICKET_PRIORITY[priority] || TICKET_PRIORITY.medium
@@ -25,7 +26,7 @@ export default function TicketRow({ ticket, isNew, onView }) {
     <Link
       href={`/dashboard/tickets/${id}`}
       onClick={onView}
-      className={`flex items-center gap-4 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-[--border] last:border-0 ${isNew ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''}`}
+      className={`flex items-center gap-4 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-[--border] last:border-0 ${isNew || hasNewMsg ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''}`}
     >
       {/* Priority indicator */}
       <div
@@ -37,10 +38,9 @@ export default function TicketRow({ ticket, isNew, onView }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <p className="text-sm font-medium text-gray-900 truncate">{subject}</p>
-          {isNew && (
-            <span className="relative flex h-2.5 w-2.5 flex-shrink-0">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500" />
+          {(isNew || hasNewMsg) && (
+            <span className="flex-shrink-0 text-blue-500 animate-pulse">
+              <BellIcon className="w-4 h-4" />
             </span>
           )}
         </div>

@@ -8,6 +8,7 @@ export function useTickets({ tenantId, status, priority, assignedTo } = {}) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [newIds, setNewIds] = useState(new Set())
+  const [newMsgIds, setNewMsgIds] = useState(new Set())
   const initialLoadDone = useRef(false)
 
   const fetchTickets = useCallback(async () => {
@@ -44,16 +45,26 @@ export function useTickets({ tenantId, status, priority, assignedTo } = {}) {
           setNewIds(prev => new Set([...prev, payload.new.id]))
         }
         const prev = document.title
-        document.title = '🔔 Neues Ticket — ' + prev
+        document.title = '[Neu] ' + prev
         setTimeout(() => { document.title = prev }, 5000)
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'tickets', filter: `tenant_id=eq.${tenantId}` }, fetchTickets)
       .subscribe()
 
-    return () => supabase.removeChannel(sub)
+    const msgSub = supabase
+      .channel(`messages:tenant:${tenantId}`)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `tenant_id=eq.${tenantId}` }, (payload) => {
+        if (payload.new?.sender_type === 'customer' && payload.new?.ticket_id) {
+          setNewMsgIds(prev => new Set([...prev, payload.new.ticket_id]))
+        }
+      })
+      .subscribe()
+
+    return () => { supabase.removeChannel(sub); supabase.removeChannel(msgSub) }
   }, [tenantId, fetchTickets])
 
   const clearNew = (id) => setNewIds(prev => { const s = new Set(prev); s.delete(id); return s })
+  const clearNewMsg = (id) => setNewMsgIds(prev => { const s = new Set(prev); s.delete(id); return s })
 
-  return { tickets, loading, error, refetch: fetchTickets, newIds, clearNew }
+  return { tickets, loading, error, refetch: fetchTickets, newIds, clearNew, newMsgIds, clearNewMsg }
 }
