@@ -24,6 +24,7 @@ export default function TicketDetailPage() {
   const [reply, setReply] = useState('')
   const [sending, setSending] = useState(false)
   const [aiLoading, setAiLoading] = useState(false)
+  const [aiError, setAiError] = useState('')
 
   async function sendMessage(body, type = 'agent') {
     if (!body.trim()) return
@@ -42,13 +43,22 @@ export default function TicketDetailPage() {
 
   async function generateAIReply() {
     setAiLoading(true)
-    const res = await fetch('/api/claude/reply', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ticketId: id, tenantId: tenant?.id }),
-    })
-    const data = await res.json()
-    setReply(data.reply || '')
+    setAiError('')
+    try {
+      const res = await fetch('/api/claude/reply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ticketId: id, tenantId: tenant?.id }),
+      })
+      const data = await res.json()
+      if (!res.ok || data.error) {
+        setAiError(data.error || 'KI-Fehler')
+      } else {
+        setReply(data.reply || '')
+      }
+    } catch (e) {
+      setAiError('Netzwerkfehler')
+    }
     setAiLoading(false)
   }
 
@@ -123,6 +133,7 @@ export default function TicketDetailPage() {
               rows={4}
               className="w-full text-sm border border-[--border] rounded-lg p-3 resize-none focus:outline-none focus:ring-2 focus:ring-[--primary]"
             />
+            {aiError && <p className="text-xs text-red-600 mt-1">{aiError}</p>}
             <div className="flex justify-between mt-2">
               <Button variant="ghost" size="sm" onClick={generateAIReply} loading={aiLoading}>
                 ✨ KI-Antwort

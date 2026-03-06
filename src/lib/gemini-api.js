@@ -3,7 +3,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
 
 export async function generateTicketReply({ ticket, messages, orderData, tenantName }) {
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' })
+  const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' })
 
   const systemContext = `Du bist ein freundlicher, professioneller Kundenservice-Mitarbeiter für ${tenantName || 'einen JTL-Händler'}.
 Antworte immer auf Deutsch. Sei präzise, hilfreich und lösungsorientiert.
