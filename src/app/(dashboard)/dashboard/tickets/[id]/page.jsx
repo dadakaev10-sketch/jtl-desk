@@ -109,9 +109,7 @@ export default function TicketDetailPage() {
   }
 
   async function deleteTicket() {
-    const supabase = getSupabaseClient()
-    await supabase.from('messages').delete().eq('ticket_id', id)
-    await supabase.from('tickets').delete().eq('id', id)
+    await fetch(`/api/tickets/${id}`, { method: 'DELETE' })
     window.location.href = '/dashboard/tickets'
   }
 
