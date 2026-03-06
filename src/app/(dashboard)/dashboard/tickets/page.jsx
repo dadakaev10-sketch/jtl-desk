@@ -22,7 +22,7 @@ const STATUS_FILTERS = [
 export default function TicketsPage() {
   const { tenant } = useTenant()
   const [statusFilter, setStatusFilter] = useState('')
-  const { tickets, loading } = useTickets({ tenantId: tenant?.id, status: statusFilter || undefined })
+  const { tickets, loading, newIds, clearNew } = useTickets({ tenantId: tenant?.id, status: statusFilter || undefined })
 
   return (
     <div>
@@ -63,7 +63,9 @@ export default function TicketsPage() {
             action={{ label: 'Neues Ticket erstellen', onClick: () => {} }}
           />
         ) : (
-          tickets.map((ticket) => <TicketRow key={ticket.id} ticket={ticket} />)
+          tickets.map((ticket) => (
+            <TicketRow key={ticket.id} ticket={ticket} isNew={newIds.has(ticket.id)} onView={() => clearNew(ticket.id)} />
+          ))
         )}
       </Card>
     </div>

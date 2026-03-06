@@ -1,12 +1,14 @@
 'use client'
 
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { getSupabaseClient } from '@/lib/supabase-client'
 
 export function useTickets({ tenantId, status, priority, assignedTo } = {}) {
   const [tickets, setTickets] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [newIds, setNewIds] = useState(new Set())
+  const initialLoadDone = useRef(false)
 
   const fetchTickets = useCallback(async () => {
     if (!tenantId) return
@@ -26,6 +28,7 @@ export function useTickets({ tenantId, status, priority, assignedTo } = {}) {
     if (error) { setError(error); setLoading(false); return }
     setTickets(data || [])
     setLoading(false)
+    initialLoadDone.current = true
   }, [tenantId, status, priority, assignedTo])
 
   useEffect(() => {
@@ -35,8 +38,11 @@ export function useTickets({ tenantId, status, priority, assignedTo } = {}) {
     const supabase = getSupabaseClient()
     const sub = supabase
       .channel(`tickets:${tenantId}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'tickets', filter: `tenant_id=eq.${tenantId}` }, () => {
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'tickets', filter: `tenant_id=eq.${tenantId}` }, (payload) => {
         fetchTickets()
+        if (initialLoadDone.current && payload.new?.id) {
+          setNewIds(prev => new Set([...prev, payload.new.id]))
+        }
         const prev = document.title
         document.title = '🔔 Neues Ticket — ' + prev
         setTimeout(() => { document.title = prev }, 5000)
@@ -47,5 +53,7 @@ export function useTickets({ tenantId, status, priority, assignedTo } = {}) {
     return () => supabase.removeChannel(sub)
   }, [tenantId, fetchTickets])
 
-  return { tickets, loading, error, refetch: fetchTickets }
+  const clearNew = (id) => setNewIds(prev => { const s = new Set(prev); s.delete(id); return s })
+
+  return { tickets, loading, error, refetch: fetchTickets, newIds, clearNew }
 }

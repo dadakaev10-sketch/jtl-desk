@@ -15,7 +15,7 @@ function timeAgo(ts) {
   return `vor ${Math.floor(h / 24)} Tagen`
 }
 
-export default function TicketRow({ ticket }) {
+export default function TicketRow({ ticket, isNew, onView }) {
   const { id, subject, status, priority, assigned_to, sla_deadline, channel, created_at } = ticket
   const statusCfg = TICKET_STATUS[status] || TICKET_STATUS.open
   const priorityCfg = TICKET_PRIORITY[priority] || TICKET_PRIORITY.medium
@@ -24,7 +24,8 @@ export default function TicketRow({ ticket }) {
   return (
     <Link
       href={`/dashboard/tickets/${id}`}
-      className="flex items-center gap-4 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-[--border] last:border-0"
+      onClick={onView}
+      className={`flex items-center gap-4 px-4 py-3 hover:bg-gray-50 transition-colors border-b border-[--border] last:border-0 ${isNew ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''}`}
     >
       {/* Priority indicator */}
       <div
@@ -34,7 +35,15 @@ export default function TicketRow({ ticket }) {
 
       {/* Subject + channel */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-gray-900 truncate">{subject}</p>
+        <div className="flex items-center gap-2">
+          <p className="text-sm font-medium text-gray-900 truncate">{subject}</p>
+          {isNew && (
+            <span className="relative flex h-2.5 w-2.5 flex-shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-blue-500" />
+            </span>
+          )}
+        </div>
         <div className="flex items-center gap-2 mt-0.5">
           {channelCfg && (
             <span className="inline-flex items-center gap-1 text-xs text-[--text-muted]">
