@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getSupabaseClient } from '@/lib/supabase-client'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Card from '@/components/ui/Card'
@@ -50,31 +49,18 @@ export default function OnboardingPage() {
   async function finish() {
     setLoading(true)
     setError(null)
-    const supabase = getSupabaseClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { router.push('/login'); return }
-
-    const slug = data.shopName.toLowerCase().replace(/[^a-z0-9]/g, '-')
-
-    const { data: tenant, error: te } = await supabase
-      .from('tenants')
-      .insert({
-        name: data.shopName,
-        slug,
-        jtl_api_key: data.jtlApiKey || null,
-        jtl_api_url: data.jtlApiUrl || null,
-      })
-      .select()
-      .single()
-
-    if (te) { setError(te.message); setLoading(false); return }
-
-    await supabase.from('agents').insert({
-      tenant_id: tenant.id,
-      user_id: user.id,
-      name: user.email.split('@')[0],
-      role: 'admin',
+    const res = await fetch('/api/onboarding/create-tenant', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        shopName: data.shopName,
+        jtlApiKey: data.jtlApiKey || null,
+        jtlApiUrl: data.jtlApiUrl || null,
+      }),
     })
+
+    const result = await res.json()
+    if (!res.ok) { setError(result.error || 'Fehler beim Erstellen'); setLoading(false); return }
 
     router.push('/dashboard')
   }
