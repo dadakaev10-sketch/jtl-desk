@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import { useTicket } from '@/hooks/useTicket'
 import { useTenant } from '@/hooks/useTenant'
@@ -20,20 +20,39 @@ function timeStr(ts) {
 
 export default function TicketDetailPage() {
   const { id } = useParams()
-  const { ticket, messages, loading } = useTicket(id)
+  const { ticket, messages, setMessages, loading } = useTicket(id)
   const { tenant } = useTenant()
   const [reply, setReply] = useState('')
   const [sending, setSending] = useState(false)
   const [aiLoading, setAiLoading] = useState(false)
   const [aiError, setAiError] = useState('')
+  const messagesEndRef = useRef(null)
+
+  // Auto-scroll wenn neue Nachrichten ankommen
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
 
   async function sendMessage(body, type = 'agent') {
     if (!body.trim()) return
     setSending(true)
+    setReply('')
+
+    // Optimistisches Update — sofort anzeigen ohne auf Supabase-Realtime zu warten
+    const tempMsg = {
+      id: `temp-${Date.now()}`,
+      ticket_id: id,
+      tenant_id: tenant?.id,
+      sender_type: type,
+      sender_name: type === 'agent' ? 'Agent' : 'Bot',
+      body,
+      created_at: new Date().toISOString(),
+    }
+    setMessages(prev => [...prev, tempMsg])
 
     // Bei WhatsApp-Tickets: Antwort auch via Bridge senden
     if (ticket?.channel === 'whatsapp' && ticket?.customer_phone) {
-      await fetch('/api/openclaw/process', {
+      fetch('/api/openclaw/process', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -42,18 +61,22 @@ export default function TicketDetailPage() {
           message: body,
           target: ticket.customer_phone,
         }),
-      }).catch(() => {}) // Fehler ignorieren — Nachricht wird trotzdem gespeichert
+      }).catch(() => {})
     }
 
     const supabase = getSupabaseClient()
-    await supabase.from('messages').insert({
+    const { data } = await supabase.from('messages').insert({
       ticket_id: id,
       tenant_id: tenant?.id,
       sender_type: type,
       sender_name: type === 'agent' ? 'Agent' : 'Bot',
       body,
-    })
-    setReply('')
+    }).select().single()
+
+    // Temp-Nachricht durch echte ersetzen
+    if (data) {
+      setMessages(prev => prev.map(m => m.id === tempMsg.id ? data : m))
+    }
     setSending(false)
   }
 
@@ -125,7 +148,7 @@ export default function TicketDetailPage() {
         {/* Messages */}
         <div className="lg:col-span-2 space-y-4">
           <Card padding="none">
-            <div className="divide-y divide-[--border] max-h-[500px] overflow-y-auto">
+            <div className="divide-y divide-[--border] max-h-[500px] overflow-y-auto" id="messages-container">
               {messages.length === 0 ? (
                 <p className="text-sm text-[--text-muted] p-4">Noch keine Nachrichten.</p>
               ) : (
@@ -145,6 +168,7 @@ export default function TicketDetailPage() {
                   </div>
                 ))
               )}
+              <div ref={messagesEndRef} />
             </div>
           </Card>
 

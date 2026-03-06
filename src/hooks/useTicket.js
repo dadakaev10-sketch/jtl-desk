@@ -47,5 +47,5 @@ export function useTicket(ticketId) {
     return () => supabase.removeChannel(sub)
   }, [ticketId, fetchTicket])
 
-  return { ticket, messages, loading, error, refetch: fetchTicket }
+  return { ticket, messages, setMessages, loading, error, refetch: fetchTicket }
 }

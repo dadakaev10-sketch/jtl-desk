@@ -35,7 +35,13 @@ export function useTickets({ tenantId, status, priority, assignedTo } = {}) {
     const supabase = getSupabaseClient()
     const sub = supabase
       .channel(`tickets:${tenantId}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'tickets', filter: `tenant_id=eq.${tenantId}` }, fetchTickets)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'tickets', filter: `tenant_id=eq.${tenantId}` }, () => {
+        fetchTickets()
+        const prev = document.title
+        document.title = '🔔 Neues Ticket — ' + prev
+        setTimeout(() => { document.title = prev }, 5000)
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'tickets', filter: `tenant_id=eq.${tenantId}` }, fetchTickets)
       .subscribe()
 
     return () => supabase.removeChannel(sub)
