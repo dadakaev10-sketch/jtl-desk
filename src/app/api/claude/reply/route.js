@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase-server'
-import { generateTicketReply } from '@/lib/claude-api'
+import { generateTicketReply } from '@/lib/gemini-api'
 
 export async function POST(request) {
   const supabase = createSupabaseServerClient()
