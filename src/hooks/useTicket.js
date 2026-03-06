@@ -40,7 +40,9 @@ export function useTicket(ticketId) {
     const sub = supabase
       .channel(`ticket:${ticketId}`)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `ticket_id=eq.${ticketId}` },
-        (payload) => setMessages((prev) => [...prev, payload.new])
+        (payload) => setMessages((prev) =>
+        prev.some(m => m.id === payload.new.id) ? prev : [...prev, payload.new]
+      )
       )
       .subscribe()
 
